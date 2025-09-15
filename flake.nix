@@ -80,73 +80,74 @@
             platforms = pkgs.lib.platforms.unix;
           };
         };
-
-      devShells = forAllSystems ({ pkgs }: {
-        default = pkgs.mkShell {
-          packages = with pkgs; [
-            # Nix development tools
-            nixd
-            nixpkgs-fmt
-            
-            # Go development tools
-            go
-            gopls
-            gotools
-            go-tools
-            
-            # Testing tools
-            ginkgo
-            gomega
-          ];
-          
-          # Environment variables
-          shellHook = ''
-            echo "ssg-go development environment"
-            echo "Go version: $(go version)"
-            echo "Test data will be available at ./testdata (submodule)"
-            
-            # Check if testdata submodule exists
-            if [ ! -d "./testdata" ]; then
-              echo "Warning: testdata submodule not found. Run:"
-              echo "  git submodule add https://github.com/soyart/ssg-testdata.git testdata"
-            fi
-          '';
-        };
-      });
-
-      # Nix flake checks
-      checks = forAllSystems ({ pkgs }: {
-        # Build check
-        build = self.packages.${pkgs.system}.default;
-        
-        # Test check
-        test = pkgs.runCommand "ssg-go-tests" {
-          nativeBuildInputs = with pkgs; [ go ];
-        } ''
-          cp -r ${self}/* .
-          chmod -R +w .
-          
-          # Ensure test data is available
-          ln -sf ${ssg-testdata} ./testdata
-          
-          # Run tests
-          go test -v -count=1 -race ./...
-          
-          touch $out
-        '';
-        
-        # Lint check
-        lint = pkgs.runCommand "ssg-go-lint" {
-          nativeBuildInputs = with pkgs; [ go-tools ];
-        } ''
-          cp -r ${self}/* .
-          chmod -R +w .
-          
-          # Run linter
-          golangci-lint run
-          
-          touch $out
-        '';
-      });
     };
+
+    # Nix flake checks
+    checks = forAllSystems ({ pkgs }: {
+      # Build check
+      build = self.packages.${pkgs.system}.default;
+      
+      # Test check
+      test = pkgs.runCommand "ssg-go-tests" {
+        nativeBuildInputs = with pkgs; [ go ];
+      } ''
+        cp -r ${self}/* .
+        chmod -R +w .
+        
+        # Ensure test data is available
+        ln -sf ${ssg-testdata} ./testdata
+        
+        # Run tests
+        go test -v -count=1 -race ./...
+        
+        touch $out
+      '';
+      
+      # Lint check
+      lint = pkgs.runCommand "ssg-go-lint" {
+        nativeBuildInputs = with pkgs; [ go-tools ];
+      } ''
+        cp -r ${self}/* .
+        chmod -R +w .
+        
+        # Run linter
+        golangci-lint run
+        
+        touch $out
+      '';
+    });
+
+    devShells = forAllSystems ({ pkgs }: {
+      default = pkgs.mkShell {
+        packages = with pkgs; [
+          # Nix development tools
+          nixd
+          nixpkgs-fmt
+          
+          # Go development tools
+          go
+          gopls
+          gotools
+          go-tools
+          
+          # Testing tools
+          ginkgo
+          gomega
+        ];
+        
+        # Environment variables
+        shellHook = ''
+          echo "ssg-go development environment"
+          echo "Go version: $(go version)"
+          echo "Test data will be available at ./testdata (submodule)"
+          
+          # Check if testdata submodule exists
+          if [ ! -d "./testdata" ]; then
+            echo "Warning: testdata submodule not found. Run:"
+            echo "  git submodule add https://github.com/soyart/ssg-testdata.git testdata"
+          fi
+        '';
+      };
+    });
+
 }
