@@ -1,0 +1,3 @@
+[submodule "ssg-testdata"]
+	path = ssg-testdata
+	url = https://github.com/soyart/ssg-testdata
