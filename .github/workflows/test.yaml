@@ -20,30 +20,30 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     env:
-      ARTIFACT_SSG_GO: "ssg-go-test_result-go${{ matrix.go-version }}_${{ matrix.os }}.json"
+      ARTIFACT_TEST: "ssg-go-test_result-go${{ matrix.go-version }}_${{ matrix.os }}.json"
     steps:
+      - name: Setup Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
       - name: Checkout code
         uses: actions/checkout@master
         with:
           fetch-depth: "0"
           submodules: recursive
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ matrix.go-version }}
-          go-version-file: "./go.mod"
-          cache: false
-          check-latest: true
-
       - name: Test ssg-go
         run: |
-          echo "PWD: $pwd"
-          echo "Testing ssg-go and writing JSON report to $ARTIFACT_SSG_GO"
-          go test -race -count=1 -json ./... | tee $ARTIFACT_SSG_GO
+          nix develop --command bash -c "
+            echo "PWD: $pwd"
+            echo "Inspect $pwd:"
+            tree .
+
+            echo "==== STARTING TEST ===="
+            go test -race -count=1 -p=1 -json ./... | tee $ARTIFACT_TEST
+          ";
 
       - name: Upload Go test results
         uses: actions/upload-artifact@v4
         with:
           name: test_result-go${{ matrix.go-version }}_${{ matrix.os }}
-          path: ${{ env.ARTIFACT_SSG_GO }}
+          path: ${{ env.ARTIFACT_TEST }}

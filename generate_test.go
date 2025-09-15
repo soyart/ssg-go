@@ -11,7 +11,7 @@ import (
 // TestGenerateStreaming tests that all files are properly flushed to destination when streaming,
 // and that all outputs are identical
 func TestGenerateStreaming(t *testing.T) {
-	root := "../testdata/johndoe.com"
+	root := "./ssg-testdata/johndoe.com"
 	src := filepath.Join(root, "/src")
 	dst := filepath.Join(root, "/dstBuild")
 	dstStreaming := filepath.Join(root, "/dstStreaming")

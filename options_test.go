@@ -154,8 +154,8 @@ func changeFilename(path string) string {
 }
 
 func TestChainPipelines(t *testing.T) {
-	src := "../testdata/myblog/src"
-	dst := "../testdata/myblog/dst-chain-pipes"
+	src := "./ssg-testdata/myblog/src"
+	dst := "./ssg-testdata/myblog/dst-chain-pipes"
 
 	err := os.RemoveAll(dst)
 	if err != nil {

@@ -1,0 +1,35 @@
+{
+	"johndoe.com": {
+		"name": "JohnDoe.com",
+		"url": "https://johndoe.com",
+		"src": "johndoe.com/src",
+		"dst": "johndoe.com/dst",
+		"cleanup": true,
+		"generate-index": true,
+		"copies": {
+			"./assets/some.txt": "johndoe.com/src/some-txt.txt",
+			"./assets/some": {
+				"force": true,
+				"target": "johndoe.com/src/drop"
+			},
+			"./assets/style.css": [
+				{
+					"target": "johndoe.com/src/style.css",
+					"force": true
+				},
+				{
+					"target": "johndoe.com/src/style-copy-0.css",
+					"force": true
+				},
+				"johndoe.com/src/style-copy-1.css"
+			]
+		},
+		"replaces": {
+			"replace-me-0": "replaced-text-0",
+			"replace-me-1": {
+				"text": "replaced-text-1",
+				"count": 3
+			}
+		}
+	}
+}
