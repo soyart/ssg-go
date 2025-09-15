@@ -24,26 +24,20 @@ jobs:
     env:
       ARTIFACT_SSG_GO: "ssg-go-bin-go${{ matrix.go-version }}_${{ matrix.os }}"
     steps:
+      - name: Setup Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
       - name: Checkout code
         uses: actions/checkout@master
         with:
           fetch-depth: "0"
           submodules: recursive
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ matrix.go-version }}
-          go-version-file: "./go.mod"
-          cache: false
-          check-latest: true
-
       - name: Build ssg-go
         run: |
-          echo "PWD: $pwd"
+          nix build .
           mkdir -p $ARTIFACT_SSG_GO
-          echo 'Building ssg-go/ssg'
-          go build -o $ARTIFACT_SSG_GO/ssg ./cmd/ssg
+          cp -a result/bin/* $ARTIFACT_SSG_GO/
 
       - name: Upload Go build results
         uses: actions/upload-artifact@v4
