@@ -22,7 +22,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     env:
-      ARTIFACT_SSG_GO: "ssg-go-bin-go${{ matrix.go-version }}_${{ matrix.os }}"
+      ARTIFACT_BUILD: "ssg-go-bin-go${{ matrix.go-version }}_${{ matrix.os }}"
     steps:
       - name: Setup Nix
         uses: DeterminateSystems/nix-installer-action@main
@@ -36,11 +36,11 @@ jobs:
       - name: Build ssg-go
         run: |
           nix build .
-          mkdir -p $ARTIFACT_SSG_GO
-          cp -a result/bin/* $ARTIFACT_SSG_GO/
+          mkdir -p $ARTIFACT_BUILD
+          cp -a result/bin/* $ARTIFACT_BUILD/
 
       - name: Upload Go build results
         uses: actions/upload-artifact@v4
         with:
           name: build_result-go${{ matrix.go-version }}_${{ matrix.os }}
-          path: ${{ env.ARTIFACT_SSG_GO }}
+          path: ${{ env.ARTIFACT_BUILD }}

@@ -40,7 +40,13 @@ rec {
       });
 
       devShells = forAllSystems ({ pkgs }: {
+
         default = pkgs.mkShell {
+          shellHook = ''
+            echo "Entering Nix shell";
+            echo "Go version:";
+            go version
+          '';
           packages = with pkgs; [
             nixd
             nixpkgs-fmt
