@@ -33,10 +33,10 @@ jobs:
 
       - name: Test ssg-go
         run: |
-          nix develop . ''
+          nix develop "
             echo "PWD: $pwd"
             go test -race -count=1 -json ./... | tee $ARTIFACT_TEST
-          '';
+          ";
 
       - name: Upload Go test results
         uses: actions/upload-artifact@v4
