@@ -129,10 +129,6 @@
           gopls
           gotools
           go-tools
-          
-          # Testing tools
-          ginkgo
-          gomega
         ];
         
         # Environment variables
