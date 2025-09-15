@@ -2,6 +2,10 @@ rec {
   description = "Static site generator ssg-go";
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
+    ssg-testdata = {
+      url = "github:soyart/ssg-testdata";
+      flake = false;
+    };
   };
 
   outputs = { self, nixpkgs }:
@@ -23,6 +27,9 @@ rec {
         default = pkgs.buildGoModule {
           inherit version;
           pname = "ssg-go";
+          preCheck = ''
+            ln -sf ${self.inputs.ssg-testdata} ./ssg-testdata;
+          '';
           src = ./.;
           vendorHash = "sha256-P8vB0khyNGjYNmYwn/AfzKyB+CaK/lhcMPsO9UmDNSQ=";
           meta = {
