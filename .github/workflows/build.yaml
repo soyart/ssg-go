@@ -1,0 +1,48 @@
+name: build go
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+  push:
+
+jobs:
+  test:
+    name: Build go binaries
+    strategy:
+      matrix:
+        os:
+          - macos-latest
+          - ubuntu-latest
+
+        go-version:
+          - stable
+          - "" # empty string = read version from go.mod
+
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    env:
+      ARTIFACT_BUILD: "ssg-go-bin-go${{ matrix.go-version }}_${{ matrix.os }}"
+    steps:
+      - name: Setup Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Checkout code
+        uses: actions/checkout@master
+        with:
+          fetch-depth: "0"
+          submodules: recursive
+
+      - name: Build ssg-go
+        run: |
+          echo "build.yaml: Starting build"
+          nix build . --extra-experimental-features nix-command --extra-experimental-features flakes
+
+          mkdir -p $ARTIFACT_BUILD
+          cp -a result/bin/* $ARTIFACT_BUILD/
+
+      - name: Upload Go build results
+        uses: actions/upload-artifact@v4
+        with:
+          name: build_result-go${{ matrix.go-version }}_${{ matrix.os }}
+          path: ${{ env.ARTIFACT_BUILD }}
