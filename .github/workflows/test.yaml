@@ -35,6 +35,10 @@ jobs:
         run: |
           nix develop --command bash -c "
             echo "PWD: $pwd"
+            echo "Inspect $pwd:"
+            tree .
+
+            echo "==== STARTING TEST ===="
             go test -race -count=1 -p=1 -json ./... | tee $ARTIFACT_TEST
           ";
 

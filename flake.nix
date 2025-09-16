@@ -28,7 +28,9 @@ rec {
           inherit version;
           pname = "ssg-go";
           preCheck = ''
+            echo "preCheck: linking ssg-testdata";
             ln -sf ${inputs.ssg-testdata} ./ssg-testdata;
+            echo "preCheck: done";
           '';
           src = ./.;
           vendorHash = "sha256-P8vB0khyNGjYNmYwn/AfzKyB+CaK/lhcMPsO9UmDNSQ=";
