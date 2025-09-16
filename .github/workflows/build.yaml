@@ -35,10 +35,7 @@ jobs:
 
       - name: Build ssg-go
         run: |
-          echo "Inspect $pwd:"
-          tree .
-
-          echo "==== STARTING BUILD ===="
+          echo "build.yaml: Starting build"
           nix build . --extra-experimental-features nix-command --extra-experimental-features flakes
 
           mkdir -p $ARTIFACT_BUILD

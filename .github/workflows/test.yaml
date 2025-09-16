@@ -34,11 +34,7 @@ jobs:
       - name: Test ssg-go
         run: |
           nix develop --command bash -c "
-            echo "PWD: $pwd"
-            echo "Inspect $pwd:"
-            tree .
-
-            echo "==== STARTING TEST ===="
+            echo "test.yaml: Starting test"
             go test -race -count=1 -p=1 -json ./... | tee $ARTIFACT_TEST
           ";
 
