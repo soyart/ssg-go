@@ -33,9 +33,9 @@ jobs:
 
       - name: Test ssg-go
         run: |
-          nix develop "
+          nix develop --command bash -c "
             echo "PWD: $pwd"
-            go test -race -count=1 -json ./... | tee $ARTIFACT_TEST
+            go test -race -count=1 -p=1 -json ./... | tee $ARTIFACT_TEST
           ";
 
       - name: Upload Go test results
