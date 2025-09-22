@@ -212,15 +212,15 @@ func (s *Ssg) core(path string, data []byte, d fs.DirEntry) (OutputFile, error) 
 			return OutputFile{}, fmt.Errorf("hooks[%d]: error when building %s: %w", i, path, err)
 		}
 	}
+	target, err := mirrorPath(s.Src, s.Dst, path)
+	if err != nil {
+		return OutputFile{}, err
+	}
 
 	// Copy non-Markdown and HTML files
 	if ext := filepath.Ext(path); ext != ".md" || s.preferred.Contains(
 		ChangeExt(path, ".md", ".html"),
 	) {
-		target, err := mirrorPath(s.Src, s.Dst, path)
-		if err != nil {
-			return OutputFile{}, err
-		}
 		// Just copy the file to the destination
 		return Output(
 			target,
@@ -230,16 +230,12 @@ func (s *Ssg) core(path string, data []byte, d fs.DirEntry) (OutputFile, error) 
 		), nil
 	}
 
-	target, err := mirrorPath(s.Src, s.Dst, path)
-	if err != nil {
-		return OutputFile{}, err
-	}
-
+	// foo.md -> foo.html
 	target = ChangeExt(target, ".md", ".html")
 	header := s.headers.choose(path)
 	footer := s.footers.choose(path)
 
-	// Copy, leave the underlying data in header unchanged
+	// Copy data from header and leave the header data unchanged
 	headerText := make([]byte, header.Len())
 	_ = copy(headerText, header.Bytes())
 
