@@ -58,7 +58,7 @@ func generate(s *Ssg) error {
 	if errWrites != nil {
 		return fmt.Errorf("streaming_write_error: %w", errWrites)
 	}
-	err = GenerateMetadata(s.Src, s.Dst, s.Url, files, written, stat.ModTime())
+	err = GenerateMetadata(s.Src, s.Dst, s.URL, files, written, stat.ModTime())
 	if err != nil {
 		return err
 	}

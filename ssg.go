@@ -2,59 +2,20 @@ package ssg
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/gomarkdown/markdown/html"
-	"github.com/gomarkdown/markdown/parser"
-	ignore "github.com/sabhiram/go-gitignore"
-)
-
-const (
-	MarkerHeader = "_header.html"
-	MarkerFooter = "_footer.html"
-	SsgIgnore    = ".ssgignore"
-
-	WritersEnvKey      = "SSG_WRITERS"
-	WritersDefault int = 20
-
-	HtmlFlags     = html.CommonFlags
-	SsgExtensions = parser.CommonExtensions |
-		parser.Mmark |
-		parser.AutoHeadingIDs
-
-	HeaderDefault = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>{{from-h1}}</title>
-</head>
-<body>
-`
-	FooterDefault = `</body>
-</html>
-`
-)
-
-var (
-	// ErrBreakPipelines causes Ssg to break from pipeline iteration
-	// and use the pipeline's output
-	ErrBreakPipelines = errors.New("ssg_break_pipeline")
-
-	// ErrSkipCore causes Ssg to break from pipeline iteration
-	// and skip core processor, continuing to the new input file.
-	ErrSkipCore = errors.New("ssg_skip_core")
+	"github.com/sabhiram/go-gitignore"
 )
 
 type Ssg struct {
 	Src   string
 	Dst   string
 	Title string
-	Url   string
+	URL   string
 
 	options options
 
@@ -81,7 +42,7 @@ func New(src, dst, title, url string) Ssg {
 		Src:        src,
 		Dst:        dst,
 		Title:      title,
-		Url:        url,
+		URL:        url,
 		ssgignores: ignores.Ignore,
 		preferred:  make(Set),
 		headers:    newHeaders(HeaderDefault),
@@ -249,7 +210,7 @@ func (s *Ssg) core(path string, data []byte, d fs.DirEntry) (OutputFile, error) 
 
 	// HTML output buffer
 	buf := bytes.NewBuffer(headerText)
-	buf.Write(ToHtml(data))
+	buf.Write(ToHTML(data))
 	buf.Write(footer.Bytes())
 
 	for i, h := range s.options.hookGenerate {
@@ -276,7 +237,7 @@ func (s *Ssg) pront(l int) {
 	Fprintf(os.Stdout, "[ssg-go] wrote %d file(s) to %s\n", l, s.Dst)
 }
 
-func prepare(src, dst string) (*gitIgnorer, error) {
+func prepare(src, dst string) (*SsgIgnore, error) {
 	if src == "" {
 		return nil, fmt.Errorf("empty src")
 	}
@@ -286,12 +247,11 @@ func prepare(src, dst string) (*gitIgnorer, error) {
 	if src == dst {
 		return nil, fmt.Errorf("src is identical to dst: '%s'", src)
 	}
-
-	ssgignore := filepath.Join(src, SsgIgnore)
+	ssgignore := filepath.Join(src, MarkerSsgIgnore)
 	return ParseSsgIgnore(ssgignore)
 }
 
-func ParseSsgIgnore(path string) (*gitIgnorer, error) {
+func ParseSsgIgnore(path string) (*SsgIgnore, error) {
 	ignores, err := ignore.CompileIgnoreFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -299,15 +259,14 @@ func ParseSsgIgnore(path string) (*gitIgnorer, error) {
 		}
 		return nil, fmt.Errorf("failed to parse ssgignore at %s: %w", path, err)
 	}
-
-	return &gitIgnorer{GitIgnore: ignores}, nil
+	return &SsgIgnore{GitIgnore: ignores}, nil
 }
 
-type gitIgnorer struct {
+type SsgIgnore struct {
 	*ignore.GitIgnore
 }
 
-func (i *gitIgnorer) Ignore(path string) bool {
+func (i *SsgIgnore) Ignore(path string) bool {
 	if i == nil {
 		return false
 	}
@@ -346,7 +305,6 @@ func shouldIgnore(ignoreFn func(path string) (ignored bool), path, base string, 
 	if FileIs(stat, os.ModeSymlink) {
 		return true, nil
 	}
-
 	return false, nil
 }
 
@@ -367,6 +325,5 @@ func mirrorPath(
 	if err != nil {
 		return "", err
 	}
-
 	return filepath.Join(dst, path), nil
 }

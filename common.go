@@ -16,6 +16,42 @@ import (
 	"github.com/gomarkdown/markdown/parser"
 )
 
+const (
+	MarkerHeader    = "_header.html"
+	MarkerFooter    = "_footer.html"
+	MarkerSsgIgnore = ".ssgignore"
+
+	WritersEnvKey      = "SSG_WRITERS"
+	WritersDefault int = 20
+
+	HTMLFlags     = html.CommonFlags
+	SsgExtensions = parser.CommonExtensions |
+		parser.Mmark |
+		parser.AutoHeadingIDs
+
+	HeaderDefault = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{{from-h1}}</title>
+</head>
+<body>
+`
+	FooterDefault = `</body>
+</html>
+`
+)
+
+var (
+	// ErrBreakPipelines causes Ssg to break from pipeline iteration
+	// and use the pipeline's output
+	ErrBreakPipelines = errors.New("ssg_break_pipeline")
+
+	// ErrSkipCore causes Ssg to break from pipeline iteration
+	// and skip core processor, continuing to the new input file.
+	ErrSkipCore = errors.New("ssg_skip_core")
+)
+
 type (
 	Set map[string]struct{}
 
@@ -40,11 +76,11 @@ type (
 	}
 )
 
-// ToHtml converts md (Markdown) into HTML document
-func ToHtml(md []byte) []byte {
+// ToHTML converts md (Markdown) into HTML document
+func ToHTML(md []byte) []byte {
 	root := markdown.Parse(md, parser.NewWithExtensions(SsgExtensions))
 	renderer := html.NewRenderer(html.RendererOptions{
-		Flags: HtmlFlags,
+		Flags: HTMLFlags,
 	})
 	return markdown.Render(root, renderer)
 }

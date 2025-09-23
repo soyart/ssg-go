@@ -40,7 +40,7 @@ func (s *Ssg) walk(path string, d fs.DirEntry, err error) error {
 	case
 		MarkerHeader,
 		MarkerFooter,
-		SsgIgnore:
+		MarkerSsgIgnore:
 
 		return nil
 	}
