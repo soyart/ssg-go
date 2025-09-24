@@ -161,7 +161,7 @@ func TestChainPipelines(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	ignore, err := ssg.ParseSsgIgnore(filepath.Join(src, ssg.SsgIgnore))
+	ignore, err := ssg.ParseSsgIgnore(filepath.Join(src, ssg.MarkerSsgIgnore))
 	if err != nil {
 		panic(err)
 	}
@@ -209,7 +209,7 @@ func TestChainPipelines(t *testing.T) {
 		case
 			ssg.MarkerHeader,
 			ssg.MarkerFooter,
-			ssg.SsgIgnore:
+			ssg.MarkerSsgIgnore:
 
 			return nil
 		}

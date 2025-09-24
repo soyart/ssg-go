@@ -127,7 +127,7 @@ Some paragraph2`,
 
 	for i := range tests {
 		tc := &tests[i]
-		html := ToHtml([]byte(tc.md))
+		html := ToHTML([]byte(tc.md))
 		if actual := string(html); actual != tc.html {
 			t.Logf("len(expected)=%d, len(actual)=%d", len(html), len(actual))
 			t.Logf("expected:\n%s", tc.html)
@@ -365,8 +365,8 @@ func TestSsgignore(t *testing.T) {
 			panic("bad ignore lines")
 		}
 
-		ignorer := &gitIgnorer{GitIgnore: ignores}
-		ignored := ignorer.Ignore(tc.path)
+		ssgignore := &SsgIgnore{GitIgnore: ignores}
+		ignored := ssgignore.Ignore(tc.path)
 		if tc.expected == ignored {
 			continue
 		}

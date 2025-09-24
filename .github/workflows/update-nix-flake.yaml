@@ -9,7 +9,7 @@ on:
         default: dev
 
   schedule:
-    - cron: '0 0 * * 1,4' # Run twice a week
+    - cron: "0 0 * * 1,4" # Run twice a week
 
 jobs:
   lockfile:
@@ -30,6 +30,10 @@ jobs:
           nix-options: --debug --log-format raw
           pr-assignees: soyart
           pr-reviewers: soyart
+
+      - name: test nix build
+        run: |
+          nix build .
 
       - name: pr number
         run: echo Pull request number is ${{ steps.update.outputs.pull-request-number }}.
