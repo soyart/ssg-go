@@ -23,7 +23,7 @@ func (c *Cache) GetFile(path string) (data []byte, info fs.FileInfo, ok bool) {
 	defer c.filesMu.RUnlock()
 	entry, ok := c.files[path]
 	if !ok {
-		return nil, FileInfo{}, false
+		return nil, nil, false
 	}
 	return entry.data, entry.info, true
 }
@@ -42,7 +42,7 @@ func (c *Cache) SetFile(path string, data []byte, info fs.FileInfo) {
 	defer c.filesMu.Unlock()
 	c.files[path] = File{
 		data: data,
-		info: NewDirEntry(info),
+		info: info,
 	}
 }
 

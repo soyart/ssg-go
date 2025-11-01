@@ -5,28 +5,12 @@ import (
 	"os"
 )
 
-// OSProxy provides proxy for functions from os package
-type OSProxy interface {
-	ReadFile(path string) ([]byte, error)
-	ReadDir(path string) ([]fs.DirEntry, error)
-	Stat(path string) (fs.FileInfo, error)
-}
-
 type proxy struct {
 	Cache
 }
 
-func NewOS() OSProxy {
-	return &proxy{
-		Cache{
-			files: make(map[string]File),
-			dirs:  make(map[string][]fs.DirEntry),
-		},
-	}
-}
-
-func (w *proxy) ReadFile(path string) ([]byte, error) {
-	data, info, ok := w.GetFile(path)
+func (p *proxy) ReadFile(path string) ([]byte, error) {
+	data, info, ok := p.GetFile(path)
 	if ok {
 		return data, nil
 	}
@@ -34,12 +18,12 @@ func (w *proxy) ReadFile(path string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	w.SetFile(path, data, info)
+	p.SetFile(path, data, info)
 	return data, nil
 }
 
-func (w *proxy) ReadDir(path string) ([]fs.DirEntry, error) {
-	data, ok := w.GetDir(path)
+func (p *proxy) ReadDir(path string) ([]fs.DirEntry, error) {
+	data, ok := p.GetDir(path)
 	if ok {
 		return data, nil
 	}
@@ -47,12 +31,12 @@ func (w *proxy) ReadDir(path string) ([]fs.DirEntry, error) {
 	if err != nil {
 		return nil, err
 	}
-	w.SetDir(path, data)
+	p.SetDir(path, data)
 	return data, nil
 }
 
-func (w *proxy) Stat(path string) (fs.FileInfo, error) {
-	data, info, ok := w.GetFile(path)
+func (p *proxy) Stat(path string) (fs.FileInfo, error) {
+	data, info, ok := p.GetFile(path)
 	if ok {
 		return info, nil
 	}
@@ -60,6 +44,6 @@ func (w *proxy) Stat(path string) (fs.FileInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	w.SetFile(path, data, info)
+	p.SetFile(path, data, info)
 	return info, nil
 }
